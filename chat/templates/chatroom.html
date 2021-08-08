@@ -11,13 +11,42 @@
     <title>Chat Project</title>
   </head>
   <body>
-    <div id="user-hello"></div>
+    <div class="container">
+      <div class="row d-flex justify-content-center">
+        <div class="col-6">
+          <form action="">
+            <div class="form-group">
+              <label for="exampleFormControlTextarea1" class="h4 pt-5">Chatroom</label>
+              <textarea class="form-control" id ="chat-text" cols="80" rows="30"></textarea>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-control" id="input">
+            </div>
+            <input type="button" id="submit" value="Send" class="btn btn-secondary btn-lg btn-block">
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div id="user-hello"></div> -->
     
     {{ room_name|json_script:"room-name" }}
-
+    {{ rquest.user.username|json_script:"user_username" }}
 
     <script>
-        const roomName = JSON.parse(document.getElementById('room-name').textContent)
+      const roomName = JSON.parse(document.getElementById('room-name').textContent)
+      const user_username = JSON.parse(document.getElementById('user_username').textContent)
+
+      document.querySelector('#submit').onclick = function (e) {
+        const messageInputDom = document.querySelcetor('#input')
+        const message = messageInputDom.value
+        chatSocket.send(JSON.stringify({
+          'message':message,
+          'username':user_username,
+        }))
+        messageInputDom.value = ''
+      }
+        
 
         const chatSocket = new WebSocket(
             'ws://'+
@@ -30,7 +59,8 @@
         chatSocket.onmessage = function(e){
             const data = JSON.parse(e.data)
             console.log(data)
-            document.querySelector('#user-hello').innerHTML = (data.tester)
+            // document.querySelector('#user-hello').innerHTML = (data.tester)
+            document.querySelector('#chat-text').value += (data.username + ':' + data.message + '\n')
         }
     </script>
 
